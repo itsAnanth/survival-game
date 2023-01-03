@@ -4,10 +4,21 @@ import Vector from "../utils/Vector";
 import Base from "./Base";
 
 
+interface BallArgs  { 
+    x: number, y
+    : number, 
+    radius?: number, 
+    mass?: number, 
+    elasticity?: number, 
+    friction?: number, 
+    collision?: boolean, 
+    acceleration?: number, 
+    color?: string 
+};
 
 
-class Ball extends Base {
 
+abstract class Ball extends Base {
 
     pos: Vector;
     vel: Vector;
@@ -23,7 +34,7 @@ class Ball extends Base {
 
 
     constructor({ x, y, radius, mass, elasticity, friction, collision, acceleration, color }:
-        { x: number, y: number, radius?: number, mass?: number, elasticity?: number, friction?: number, collision?: boolean, acceleration?: number, color?: string }
+                BallArgs
     ) {
         super();
         /** @type {Vector} */
@@ -36,11 +47,18 @@ class Ball extends Base {
         this.mass = mass || 5;
         this.inverse_mass = (mass <= 0) ? 0 : (1 / mass);
         this.elasticity = elasticity ?? 1;
-        this.accelerationMagnitude = acceleration ?? 1;
+        this.accelerationMagnitude = acceleration ?? 0.5;
         this.friction = friction ?? Global.FRICTION;
         this.collision = collision ?? false;
         this.color = color ?? 'red';
+
+        this.create();
     }
+
+
+    abstract create(...args: any[]): void;
+    abstract destroy(...args: any[]): void;
+    abstract update(...args: any[]): void;
 
 
     /**
@@ -60,16 +78,6 @@ class Ball extends Base {
         this.vel = Vector.subtract(v, this.pos).unit().multiply(this.accelerationMagnitude);
     }
 
-
-    update() {
-        this.acc = this.acc.unit().multiply(this.accelerationMagnitude);
-        this.vel = Vector.add(this.vel, this.acc);
-        this.vel = this.vel.multiply(1 - this.friction);
-        this.pos = Vector.add(this.pos, this.vel);
-    }
-
-
-    destroy() {}
 
     /**
      * Checks collision between two ball entities
@@ -120,3 +128,5 @@ class Ball extends Base {
 }
 
 export default Ball;
+export type { BallArgs }
+
